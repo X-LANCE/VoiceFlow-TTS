@@ -173,11 +173,11 @@ class GradTTS(BaseModule):
             # traj = self.decoder.backward(y, y_mask, torch.zeros_like(y), n_timesteps=2, spk=spk, solver="euler")
             with torch.no_grad():
                 # target = traj[-1]
-                target = y
+                MAS_target = y
                 const = -0.5 * math.log(2 * math.pi) * self.n_feats
                 factor = -0.5 * torch.ones(mu_x.shape, dtype=mu_x.dtype, device=mu_x.device)
-                z_square = torch.matmul(factor.transpose(1, 2), target ** 2)
-                z_mu_double = torch.matmul(2.0 * (factor * mu_x).transpose(1, 2), target)
+                z_square = torch.matmul(factor.transpose(1, 2), MAS_target ** 2)
+                z_mu_double = torch.matmul(2.0 * (factor * mu_x).transpose(1, 2), MAS_target)
                 mu_square = torch.sum(factor * (mu_x ** 2), 1).unsqueeze(-1)
                 log_prior = z_square - z_mu_double + mu_square + const
                 # it's actually the log likelihood of target given the Gaussian with (mu_x, I)
@@ -193,7 +193,7 @@ class GradTTS(BaseModule):
 
                 # compute MLE loss
                 mu_y_uncut = torch.matmul(attn.squeeze(1).transpose(1, 2), mu_x.transpose(1, 2)).transpose(1, 2)  # here mu_x is not cut.
-                l_mle = mle_loss(target, mu_y_uncut, torch.zeros_like(mu_y_uncut), y_mask)
+                l_mle = mle_loss(MAS_target, mu_y_uncut, torch.zeros_like(mu_y_uncut), y_mask)
 
         else:
             attn = generate_path(durs, attn_mask.squeeze(1)).detach()
