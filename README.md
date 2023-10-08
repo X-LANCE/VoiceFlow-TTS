@@ -4,7 +4,19 @@
 ![traj](resources/traj.png)
 
 ## Environment Setup
+This repo is tested on **python 3.9** on Linux. You can set up the environment with conda
+```shell
+# Install required packages
+conda create -n vflow python==3.9  # or any name you like
+conda activate vflow
+pip install -r requirements.txt
 
+# Then, set PATH
+source path.sh  # change the env name in it if you don't use "vflow"
+```
+Note that to avoid the trouble of installing [torchdyn](https://github.com/DiffEqML/torchdyn), we directly copy the torchdyn 1.0.6 version here locally at `torchdyn/`.
+
+The following process may also need `bash` and `perl` commands in your environment.
 ## Data Preparation
 
 ## Training
