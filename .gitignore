@@ -153,3 +153,4 @@ cython_debug/
 synthetic_wav/
 exp/
 **/*.wav
+.DS_Store

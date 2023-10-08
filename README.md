@@ -72,9 +72,50 @@ Several notes:
 * You can set `use_gt_dur` to `false` to turn on MAS algorithm. In this setting, it is better to set `add_blank` to `true`.
 
 ## Generate Data for ReFlow and Perform Reflow
-TO BE DONE
+After training the model to some degree, it can be ready for flow rectification process.
+Flow rectification requires to generate data using the trained model and use the (noise, data) pair to train the model again.
+As this process should always involve the whole training dataset, it is recommended to run on multiple GPUs for parallel decoding.
+We provide a script to do this:
+```shell
+# Set CUDA_VISIBLE_DEVICES, or the program will use all available GPUs.
+python generate_for_reflow.py -c configs/${your_yaml} -m ${model_name} \
+                              --EMA --max-utt-num 100000000 \
+                              --dataset train \
+                              --solver euler -t 10 \
+                              --gt-dur
+# --EMA specifies to load EMA checkpoint (latest)
+# --max-utt-num sets the number of utterances to decode (in this case, arbitrarily high)
+# --solver euler -t 10 specifies the solver and timesteps. Could be adaptive solvers like dopri5.
+# --gt-dur forces the model to use ground truth duration for decoding.
+```
+This will create `synthetic_wav/${model_name}/generate_for_reflow/train` for storage. `noise.scp` together with `feats.scp` will be stored.
+After decoding the training set, you can also decode validation set by `--dataset val`.
+
+Then, specify the paths to these `feats.scp` and `noise.scp` in a new configuration yaml, like in the `lj_16k_gt_dur_reflow.yaml`:
+```yaml
+perform_reflow: true
+...
+data:
+    train:
+        feats_scp: "synthetic_wav/lj_16k_gt_dur/train/feats.scp"
+        noise_scp: "synthetic_wav/lj_16k_gt_dur/train/noise.scp"
+...
+```
+
+Now it is ready for training again in ReFlow, with the same script in training but new yaml config files.
+Feel free to copy a trained model to the new log dir for resuming.
+Also, it is possible to change the model structure and train from scratch on the reflow data.
+
 ## Inference
-TO BE DONE
+Similar to "generate data for reflow", model inference can be done by
+```shell
+python inference_dataset.py -c configs/${your_yaml} -m ${model_name} --EMA \
+                          --solver euler -t 10
+```
+This will synthesize mel-spectrograms for the validation set in your config, storing them at `synthetic_wav/${model_name}/tts_gt_spk/feats.scp`.
+Speaker, speed and temperature can be specified; see `tools.get_hparams_decode()` function for complete set of options.
+
+> TODO: VOCODER
 
 ## Acknowledgement
 During the development, the following repositories were referred to:
@@ -83,7 +124,7 @@ During the development, the following repositories were referred to:
 * [VITS](https://github.com/jaywalnut310/vits), whose distributed bucket sampler is used.
 * [CFM](https://github.com/atong01/conditional-flow-matching), for the ODE samplers.
 
-## Easter Eggs & Citation
+## 💡Easter Eggs & Citation
 This repository also contains some experimental functionalities. ⚠️Warning: not guaranteed to be correct!
 * **Voice conversion**. As GlowTTS can perform voice conversion via the disentangling property of normalizing flows, it is reasonable that flow matching can also perform it. Method `model.tts.GradTTS.voice_conversion` gives a preliminary try.
 
@@ -94,7 +135,7 @@ This repository also contains some experimental functionalities. ⚠️Warning: 
   In practice, integral is replaced by summation, and divergence is replaced by the Skilling-Hutchinson trace estimator. See the Appendix D.2 in [Song, et. al](https://arxiv.org/abs/2011.13456) for theoretical details. I implemented this in `model.tts.GradTTS.compute_likelihood`. 
 * **Optimal transport**. The conditional flow matching used in this paper is not a **marginally** optimal transport path but only a **conditionally** optimal path. For the marginal optimal transport, [Tong et. al](https://arxiv.org/abs/2302.00482) introduces to sample $x_0,x_1$ together from the joint optimal transport distribution $\pi(x_0,x_1)$. I tried this in `model.cfm.OTCFM`, though it doe not work very well for now.
 * **Different estimator architectures**. You can specify an estimator besides the `GradLogPEstimator2d` by the `model.fm_net_type` configuration. Currently the [DiffSinger](https://ojs.aaai.org/index.php/AAAI/article/view/21350)'s estimator architecture is also supported. You can add more, e.g. that introduced in [Matcha-TTS](https://github.com/shivammehta25/Matcha-TTS).
-* 💡**Better alignment learning**. This repo supports supervised duration modeling together with monotonic alignment search as that in GradTTS. However, there might be a better way for MAS in flow-matching TTS. `model.tts.GradTTS.forward` now supports beta binomial prior for alignment maps; and if you want, you can change the variable `MAS_target` to something else, e.g. flow-transformed noise!
+* **Better alignment learning**. This repo supports supervised duration modeling together with monotonic alignment search as that in GradTTS. However, there might be a better way for MAS in flow-matching TTS. `model.tts.GradTTS.forward` now supports beta binomial prior for alignment maps; and if you want, you can change the variable `MAS_target` to something else, e.g. flow-transformed noise!
 
 Feel free to cite this work if it helps 😄
 

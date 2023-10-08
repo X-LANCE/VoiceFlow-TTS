@@ -8,7 +8,6 @@ from tqdm import tqdm
 import tools
 
 
-# @profile
 def evaluate(hps, args, ckpt, feats_dir):
     logger = tools.get_logger(hps.model_dir, "inference.log")
     device = torch.device('cpu' if not torch.cuda.is_available() else "cuda")
@@ -25,7 +24,7 @@ def evaluate(hps, args, ckpt, feats_dir):
     model = model(**hps.model).to(device)
     tools.load_checkpoint(ckpt, model, None)
     print(f"Loaded checkpoint from {ckpt}")
-    _ = model.cuda().eval()
+    model.eval()
     print(f'Number of parameters: {model.nparams}')
     print(f"Number of encoder parameters: {model.encoder.nparams}")
     print(f"Number of decoder parameters: {model.decoder.nparams}")
@@ -64,23 +63,20 @@ def evaluate(hps, args, ckpt, feats_dir):
                 if hps.xvector:
                     if args.use_control_spk:
                         xvector = which_set.spk2xvector[args.control_spk_name]
-                        xvector = torch.FloatTensor(xvector).squeeze().unsqueeze(0).to(device)
+                        spk = torch.FloatTensor(xvector).squeeze().unsqueeze(0).to(device)
                     else:
-                        xvector = batch['xvector'].to(device)
-                    s = time.time()
-                    y_enc, y_dec, attn, z, pred_dur = model.inference(x, x_lengths, n_timesteps=args.timesteps, temperature=args.temperature,
-                                                       spk=xvector, length_scale=args.duration_scale, solver=args.solver, gt_dur=dur)
-                    t = time.time()
+                        spk = batch['xvector'].to(device)
+
                 else:
                     if args.use_control_spk:
-                        sid = torch.LongTensor([args.control_spk_id]).to(device)
+                        spk = torch.LongTensor([args.control_spk_id]).to(device)
                     else:
-                        sid = batch['spk_ids'].to(device)
-                    s = time.time()
-                    y_enc, y_dec, attn, z, pred_dur = model.inference(x, x_lengths, n_timesteps=args.timesteps, temperature=args.temperature,
-                                                       spk=sid, length_scale=args.duration_scale, solver=args.solver, gt_dur=dur)
-                    t = time.time()
-                total_inference_time += t-s
+                        spk = batch['spk_ids'].to(device)
+                s = time.time()
+                y_enc, y_dec, attn, z, pred_dur = model.inference(x, x_lengths, n_timesteps=args.timesteps, temperature=args.temperature,
+                                                                  spk=spk, length_scale=args.duration_scale, solver=args.solver, gt_dur=dur)
+                t = time.time()
+                total_inference_time += t - s
                 total_inference_frames += y_dec.squeeze().shape[1]
                 # =================================================
 
@@ -91,7 +87,7 @@ def evaluate(hps, args, ckpt, feats_dir):
 
                 feats(save_utt_name, y_dec.squeeze().cpu().numpy().T)  # save to ark and scp, mel: (L, 80)
         print(f"Inference finished. Total time: {total_inference_time}, total frames: {total_inference_frames} "
-              f"==> {total_inference_frames/total_inference_time} frame/s")
+              f"==> {total_inference_frames / total_inference_time} frame/s")
 
 
 if __name__ == '__main__':

@@ -162,38 +162,6 @@ def get_correct_class(hps, train=True):
     return dataset, collate(), model
 
 
-def get_hparams(init=True):
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-c', '--config', type=str, default="./configs/base.yaml",
-                        help='YAML file for configuration')
-    parser.add_argument('-m', '--model', type=str, required=True,
-                        help='Model name')
-    parser.add_argument('-s', '--seed', type=int, default=1234)
-
-    args = parser.parse_args()
-    model_dir = os.path.join("./logs", args.model)
-
-    if not os.path.exists(model_dir):
-        os.makedirs(model_dir)
-
-    config_path = args.config
-    config_save_path = os.path.join(model_dir, "config.yaml")
-    if init:
-        with open(config_path, "r") as f:
-            data = f.read()
-        with open(config_save_path, "w") as f:
-            f.write(data)
-    else:
-        with open(config_save_path, "r") as f:
-            data = f.read()
-    config = yaml.load(data,  Loader=yaml.FullLoader)
-
-    hparams = HParams(**config)
-    hparams.model_dir = model_dir
-    hparams.train.seed = args.seed
-    return hparams
-
-
 class HParams():
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
@@ -252,6 +220,38 @@ def save_checkpoint(model, optimizer, learning_rate, iteration, checkpoint_path)
                 'iteration': iteration,
                 'optimizer': optimizer.state_dict(),
                 'learning_rate': learning_rate}, checkpoint_path)
+
+
+def get_hparams(init=True):
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-c', '--config', type=str, default="./configs/base.yaml",
+                        help='YAML file for configuration')
+    parser.add_argument('-m', '--model', type=str, required=True,
+                        help='Model name')
+    parser.add_argument('-s', '--seed', type=int, default=1234)
+
+    args = parser.parse_args()
+    model_dir = os.path.join("./logs", args.model)
+
+    if not os.path.exists(model_dir):
+        os.makedirs(model_dir)
+
+    config_path = args.config
+    config_save_path = os.path.join(model_dir, "config.yaml")
+    if init:
+        with open(config_path, "r") as f:
+            data = f.read()
+        with open(config_save_path, "w") as f:
+            f.write(data)
+    else:
+        with open(config_save_path, "r") as f:
+            data = f.read()
+    config = yaml.load(data,  Loader=yaml.FullLoader)
+
+    hparams = HParams(**config)
+    hparams.model_dir = model_dir
+    hparams.train.seed = args.seed
+    return hparams
 
 
 def get_hparams_decode():

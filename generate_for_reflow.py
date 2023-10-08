@@ -42,7 +42,7 @@ def run(rank, n_gpus, hps, args, ckpt, feats_dir, temp_dir):
     model = model(**hps.model).to(device)
     tools.load_checkpoint(ckpt, model, None)
     print(f"Loaded checkpoint from {ckpt}")
-    model.to(device).eval()
+    model.eval()
     print(f"Number of parameters: {model.nparams}")
     print(f"Number of encoder parameters: {model.encoder.nparams}")
     print(f"Number of decoder parameters: {model.decoder.nparams}")
@@ -88,38 +88,25 @@ def run(rank, n_gpus, hps, args, ckpt, feats_dir, temp_dir):
                 if hps.xvector:
                     if args.use_control_spk:
                         xvector = which_set.spk2xvector[args.control_spk_name]
-                        xvector = (
-                            torch.FloatTensor(xvector).squeeze().unsqueeze(0).to(device)
-                        )
+                        spk = torch.FloatTensor(xvector).squeeze().unsqueeze(0).to(device)
                     else:
-                        xvector = batch["xvector"].to(device)
-    
-                    y_enc, y_dec, attn, z, pred_dur = model.inference(
-                        x,
-                        x_lengths,
-                        n_timesteps=args.timesteps,
-                        temperature=1.5,
-                        spk=xvector,
-                        length_scale=1.0,
-                        solver=args.solver,
-                        gt_dur=dur,
-                    )
+                        spk = batch["xvector"].to(device)
                 else:
                     if args.use_control_spk:
-                        sid = torch.LongTensor([args.control_spk_id]).to(device)
+                        spk = torch.LongTensor([args.control_spk_id]).to(device)
                     else:
-                        sid = batch["spk_ids"].to(device)
+                        spk = batch["spk_ids"].to(device)
     
-                    y_enc, y_dec, attn, z, pred_dur = model.inference(
-                        x,
-                        x_lengths,
-                        n_timesteps=args.timesteps,
-                        temperature=1.5,
-                        spk=sid,
-                        length_scale=1.0,
-                        solver=args.solver,
-                        gt_dur=dur,
-                    )
+                y_enc, y_dec, attn, z, pred_dur = model.inference(
+                    x,
+                    x_lengths,
+                    n_timesteps=args.timesteps,
+                    temperature=1.5,
+                    spk=spk,
+                    length_scale=1.0,
+                    solver=args.solver,
+                    gt_dur=dur,
+                )
                 # =================================================
     
                 if args.use_control_spk:
