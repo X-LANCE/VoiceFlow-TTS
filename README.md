@@ -1,4 +1,4 @@
-# \[Working in Progress\] VoiceFlow: Efficient Text-to-Speech with Rectified Flow Matching
+# VoiceFlow: Efficient Text-to-Speech with Rectified Flow Matching
 > This is the official implementation of [VoiceFlow](https://arxiv.org/abs/2309.05027).
 
 ![traj](resources/traj.png)
