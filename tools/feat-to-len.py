@@ -42,7 +42,7 @@ def main():
     logging.info(get_commandline_args())
 
     if args.preprocess_conf is not None:
-        from espnet.transform.transformation import Transformation
+        from espnet_transform.transformation import Transformation
         preprocessing = Transformation(args.preprocess_conf)
         logging.info('Apply preprocessing: {}'.format(preprocessing))
     else:

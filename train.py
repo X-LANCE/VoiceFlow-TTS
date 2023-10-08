@@ -185,8 +185,8 @@ def run(rank, n_gpus, hps):
                     fm_losses.append(fm_loss.item())
 
                     if batch_idx % 5 == 0:
-                        msg = (f'Epoch: {epoch}, iteration: {iteration} | dur_loss: {dur_loss.item():.4f}, prior_loss: {prior_loss.item():.4f}, '
-                               f'flow_loss: {fm_loss.item():.4f}, mle loss: {l_mle.item():.4f}')
+                        msg = (f'Epoch: {epoch}, iter: {iteration} | dur_loss: {dur_loss.item():.3f}, prior_loss: {prior_loss.item():.3f}, '
+                               f'flow_loss: {fm_loss.item():.3f}, mle loss: {l_mle.item():.3f}')
                         # logger_text.info(msg)
                         progress_bar.set_description(msg)
 

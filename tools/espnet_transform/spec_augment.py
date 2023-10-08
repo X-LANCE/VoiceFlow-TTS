@@ -38,7 +38,7 @@ def time_warp(x, max_time_warp=80, inplace=False, mode="PIL"):
     elif mode == "sparse_image_warp":
         import torch
 
-        from espnet.utils import spec_augment
+        from espnet_utils import spec_augment
 
         # TODO(karita): make this differentiable again
         return spec_augment.time_warp(torch.from_numpy(x), window).numpy()

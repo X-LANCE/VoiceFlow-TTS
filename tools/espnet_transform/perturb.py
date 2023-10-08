@@ -1,4 +1,4 @@
-import librosa
+import custom_librosa as librosa
 import numpy
 import scipy
 import soundfile

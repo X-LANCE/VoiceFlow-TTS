@@ -1,2 +1,3 @@
-conda activate py39
+conda activate vflow
 export PATH=$PWD/tools:$PATH
+chmod +x tools/*

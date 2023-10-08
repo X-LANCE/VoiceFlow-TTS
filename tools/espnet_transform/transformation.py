@@ -23,26 +23,26 @@ else:
 # TODO(karita): inherit TransformInterface
 # TODO(karita): register cmd arguments in asr_train.py
 import_alias = dict(
-    identity='espnet.transform.transform_interface:Identity',
-    time_warp='espnet.transform.spec_augment:TimeWarp',
-    time_mask='espnet.transform.spec_augment:TimeMask',
-    freq_mask='espnet.transform.spec_augment:FreqMask',
-    spec_augment='espnet.transform.spec_augment:SpecAugment',
-    speed_perturbation='espnet.transform.perturb:SpeedPerturbation',
-    volume_perturbation='espnet.transform.perturb:VolumePerturbation',
-    noise_injection='espnet.transform.perturb:NoiseInjection',
-    bandpass_perturbation='espnet.transform.perturb:BandpassPerturbation',
-    rir_convolve='espnet.transform.perturb:RIRConvolve',
-    delta='espnet.transform.add_deltas:AddDeltas',
-    cmvn='espnet.transform.cmvn:CMVN',
-    utterance_cmvn='espnet.transform.cmvn:UtteranceCMVN',
-    fbank='espnet.transform.spectrogram:LogMelSpectrogram',
-    spectrogram='espnet.transform.spectrogram:Spectrogram',
-    stft='espnet.transform.spectrogram:Stft',
-    istft='espnet.transform.spectrogram:IStft',
-    stft2fbank='espnet.transform.spectrogram:Stft2LogMelSpectrogram',
-    wpe='espnet.transform.wpe:WPE',
-    channel_selector='espnet.transform.channel_selector:ChannelSelector')
+    identity='espnet_transform.transform_interface:Identity',
+    time_warp='espnet_transform.spec_augment:TimeWarp',
+    time_mask='espnet_transform.spec_augment:TimeMask',
+    freq_mask='espnet_transform.spec_augment:FreqMask',
+    spec_augment='espnet_transform.spec_augment:SpecAugment',
+    speed_perturbation='espnet_transform.perturb:SpeedPerturbation',
+    volume_perturbation='espnet_transform.perturb:VolumePerturbation',
+    noise_injection='espnet_transform.perturb:NoiseInjection',
+    bandpass_perturbation='espnet_transform.perturb:BandpassPerturbation',
+    rir_convolve='espnet_transform.perturb:RIRConvolve',
+    delta='espnet_transform.add_deltas:AddDeltas',
+    cmvn='espnet_transform.cmvn:CMVN',
+    utterance_cmvn='espnet_transform.cmvn:UtteranceCMVN',
+    fbank='espnet_transform.spectrogram:LogMelSpectrogram',
+    spectrogram='espnet_transform.spectrogram:Spectrogram',
+    stft='espnet_transform.spectrogram:Stft',
+    istft='espnet_transform.spectrogram:IStft',
+    stft2fbank='espnet_transform.spectrogram:Stft2LogMelSpectrogram',
+    wpe='espnet_transform.wpe:WPE',
+    channel_selector='espnet_transform.channel_selector:ChannelSelector')
 
 
 class Transformation(object):

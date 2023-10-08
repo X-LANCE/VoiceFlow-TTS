@@ -13,7 +13,7 @@
 
 ## Acknowledgement
 During the development, the following repositories were referred to:
-* [Kaldi](https://github.com/kaldi-asr/kaldi), for most utility scripts in `utils/`.
+* [Kaldi](https://github.com/kaldi-asr/kaldi) and [UniCATS-CTX-vec2wav](https://github.com/cantabile-kwok/UniCATS-CTX-vec2wav) for most utility scripts in `utils/`.
 * [GradTTS](https://github.com/huawei-noah/Speech-Backbones/tree/main/Grad-TTS), where most of the model architecture and training pipelines are adopted.
 * [VITS](https://github.com/jaywalnut310/vits), whose distributed bucket sampler is used.
 * [CFM](https://github.com/atong01/conditional-flow-matching), for the ODE samplers.
