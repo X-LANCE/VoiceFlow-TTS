@@ -1,3 +1,3 @@
 conda activate vflow
-export PATH=$PWD/tools:$PATH
-chmod +x tools/*
+export PATH=$PWD/utils:$PATH
+chmod +x utils/*

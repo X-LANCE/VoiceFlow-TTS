@@ -17,9 +17,9 @@ import torch
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from data_collate import DistributedBucketSampler
-from utils import plot_tensor, save_plot
+from tools import plot_tensor, save_plot
 from model.utils import fix_len_compatibility
-import utils
+import tools
 
 
 class ModelEmaV2(torch.nn.Module):
@@ -52,7 +52,7 @@ class ModelEmaV2(torch.nn.Module):
 
 
 def run(rank, n_gpus, hps):
-    logger_text = utils.get_logger(hps.model_dir)
+    logger_text = tools.get_logger(hps.model_dir)
     logger_text.info(hps)
     out_size = fix_len_compatibility(getattr(hps.data, "cut_segment_seconds", 2) * hps.data.sampling_rate // hps.data.hop_length)
     # NOTE: cut_segment_seconds sec of mel-spec
@@ -68,8 +68,8 @@ def run(rank, n_gpus, hps):
     if rank == 0:
         print('Initializing logger...')
         logger = SummaryWriter(log_dir=log_dir)
-    train_dataset, collate, model = utils.get_correct_class(hps)
-    test_dataset, _, _ = utils.get_correct_class(hps, train=False)
+    train_dataset, collate, model = tools.get_correct_class(hps)
+    test_dataset, _, _ = tools.get_correct_class(hps, train=False)
 
     print('Initializing data loaders...')
     train_sampler = DistributedBucketSampler(
@@ -108,11 +108,11 @@ def run(rank, n_gpus, hps):
 
     try:
         try:
-            ckpt = utils.latest_checkpoint_path(hps.model_dir, "EMA_grad_*.pt")
+            ckpt = tools.latest_checkpoint_path(hps.model_dir, "EMA_grad_*.pt")
         except IndexError:
             print(f"Cannot find EMA checkpoint. Trying to find normal checkpoint.")
-            ckpt = utils.latest_checkpoint_path(hps.model_dir, "grad_*.pt")
-        model, optimizer, learning_rate, epoch_logged = utils.load_checkpoint(ckpt, model, optimizer)
+            ckpt = tools.latest_checkpoint_path(hps.model_dir, "grad_*.pt")
+        model, optimizer, learning_rate, epoch_logged = tools.load_checkpoint(ckpt, model, optimizer)
         epoch_start = epoch_logged + 1
         print(f"Loaded checkpoint from {epoch_logged} epoch, resuming training.")
         # optimizer.step_num = (epoch_str - 1) * len(train_dataset)
@@ -232,8 +232,8 @@ def run(rank, n_gpus, hps):
                     save_plot(attn.squeeze().cpu(),
                               f'{log_dir}/alignment_{i}.png')
 
-            utils.save_checkpoint(ema_model, optimizer, learning_rate, epoch, checkpoint_path=f"{log_dir}/EMA_grad_{epoch}.pt")
-            utils.save_checkpoint(model, optimizer, learning_rate, epoch, checkpoint_path=f"{log_dir}/grad_{epoch}.pt")
+            tools.save_checkpoint(ema_model, optimizer, learning_rate, epoch, checkpoint_path=f"{log_dir}/EMA_grad_{epoch}.pt")
+            tools.save_checkpoint(model, optimizer, learning_rate, epoch, checkpoint_path=f"{log_dir}/grad_{epoch}.pt")
 
 
 if __name__ == "__main__":
@@ -245,5 +245,5 @@ if __name__ == "__main__":
     os.environ['MASTER_ADDR'] = 'localhost'
     os.environ['MASTER_PORT'] = '8001'
 
-    hps = utils.get_hparams()
+    hps = tools.get_hparams()
     mp.spawn(run, nprocs=n_gpus, args=(n_gpus, hps,))

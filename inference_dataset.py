@@ -5,16 +5,16 @@ from kaldiio import WriteHelper
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-import utils
+import tools
 
 
 # @profile
 def evaluate(hps, args, ckpt, feats_dir):
-    logger = utils.get_logger(hps.model_dir, "inference.log")
+    logger = tools.get_logger(hps.model_dir, "inference.log")
     device = torch.device('cpu' if not torch.cuda.is_available() else "cuda")
     torch.manual_seed(hps.train.seed)  # NOTE: control seed
-    train_dataset, collate_fn, model = utils.get_correct_class(hps)
-    val_dataset, _, _ = utils.get_correct_class(hps, train=False)
+    train_dataset, collate_fn, model = tools.get_correct_class(hps)
+    val_dataset, _, _ = tools.get_correct_class(hps, train=False)
     batch_collate = collate_fn
     train_loader = DataLoader(dataset=train_dataset, batch_size=1,
                               collate_fn=batch_collate, drop_last=True,
@@ -23,7 +23,7 @@ def evaluate(hps, args, ckpt, feats_dir):
                             collate_fn=batch_collate, drop_last=True,
                             num_workers=4, shuffle=False)
     model = model(**hps.model).to(device)
-    utils.load_checkpoint(ckpt, model, None)
+    tools.load_checkpoint(ckpt, model, None)
     print(f"Loaded checkpoint from {ckpt}")
     _ = model.cuda().eval()
     print(f'Number of parameters: {model.nparams}')
@@ -95,8 +95,8 @@ def evaluate(hps, args, ckpt, feats_dir):
 
 
 if __name__ == '__main__':
-    hps, args = utils.get_hparams_decode()
-    ckpt = utils.latest_checkpoint_path(hps.model_dir, "grad_*.pt" if not args.EMA else "EMA_grad_*.pt")
+    hps, args = tools.get_hparams_decode()
+    ckpt = tools.latest_checkpoint_path(hps.model_dir, "grad_*.pt" if not args.EMA else "EMA_grad_*.pt")
 
     if args.use_control_spk:
         feats_dir = f"synthetic_wav/{args.model}/tts_other_spk"

@@ -9,18 +9,18 @@ import tempfile
 import torch.multiprocessing as mp
 import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel as DDP
-import utils
+import tools
 
 
 def run(rank, n_gpus, hps, args, ckpt, feats_dir, temp_dir):
-    logger = utils.get_logger(hps.model_dir, f"inference.{rank}.log")  # NOTE: cannot delete this line.
+    logger = tools.get_logger(hps.model_dir, f"inference.{rank}.log")  # NOTE: cannot delete this line.
     device = torch.device('cpu' if not torch.cuda.is_available() else f"cuda:{rank}")
     torch.manual_seed(hps.train.seed)  # NOTE: control seed
 
     setattr(hps.data, "train_utts" if args.dataset == "train" else "val_utts", f"{temp_dir}/{rank}.txt")
 
-    train_dataset, collate_fn, model = utils.get_correct_class(hps)
-    val_dataset, _, _ = utils.get_correct_class(hps, train=False)
+    train_dataset, collate_fn, model = tools.get_correct_class(hps)
+    val_dataset, _, _ = tools.get_correct_class(hps, train=False)
 
     batch_collate = collate_fn
     train_loader = DataLoader(
@@ -40,7 +40,7 @@ def run(rank, n_gpus, hps, args, ckpt, feats_dir, temp_dir):
         shuffle=False,
     )
     model = model(**hps.model).to(device)
-    utils.load_checkpoint(ckpt, model, None)
+    tools.load_checkpoint(ckpt, model, None)
     print(f"Loaded checkpoint from {ckpt}")
     model.to(device).eval()
     print(f"Number of parameters: {model.nparams}")
@@ -147,8 +147,8 @@ if __name__ == '__main__':
     os.environ["MASTER_ADDR"] = "localhost"
     os.environ["MASTER_PORT"] = "80000"
 
-    hps, args = utils.get_hparams_decode()
-    ckpt = utils.latest_checkpoint_path(hps.model_dir, "grad_*.pt" if not args.EMA else "EMA_grad_*.pt")
+    hps, args = tools.get_hparams_decode()
+    ckpt = tools.latest_checkpoint_path(hps.model_dir, "grad_*.pt" if not args.EMA else "EMA_grad_*.pt")
 
     if args.use_control_spk:
         feats_dir = f"synthetic_wav/{args.model}/tts_other_spk"

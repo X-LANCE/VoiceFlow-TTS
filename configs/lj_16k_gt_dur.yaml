@@ -1,0 +1,55 @@
+xvector: false  # whether to use xvector for speaker modeling.
+
+perform_reflow: false  # if true, will need noise_scp be specified
+
+train:
+    test_size: 4
+    n_epochs: 10000
+    batch_size: 24
+    learning_rate: !!float 5e-5
+    seed: 37
+    save_every: 10
+    use_gt_dur: true  # whether to supervise duration modeling
+
+data:
+    sampling_rate: 16000
+    n_mel_channels: 80
+    add_blank: false  # whether to add blank tokens between each input phones
+    hop_length: 200  # in sampling points
+
+    phn2id: "data/ljspeech/phones.txt"
+
+    train:
+        utts: "data/ljspeech/train/utts.list"
+        utt2phns: "data/ljspeech/train/text"
+        utt2phn_duration: "data/ljspeech/train/phn_duration"
+        feats_scp: "feats/normed_fbank/ljspeech/train/feats.scp"
+        utt2num_frames: "feats/normed_fbank/ljspeech/train/utt2num_frames"
+        utt2spk: "data/ljspeech/train/utt2spk_id.json"
+
+    val:
+        utts: "data/ljspeech/val/utts.list"
+        utt2phns: "data/ljspeech/val/text"
+        utt2phn_duration: "data/ljspeech/val/phn_duration"
+        feats_scp: "feats/normed_fbank/ljspeech/val/feats.scp"
+        utt2num_frames: "feats/normed_fbank/ljspeech/val/utt2num_frames"
+        utt2spk: "data/ljspeech/val/utt2spk_id.json"
+
+model:
+    n_vocab: 148
+    n_spks: 1
+    spk_emb_dim: 64
+    n_enc_channels: 192
+    filter_channels: 768
+    filter_channels_dp: 256
+    n_enc_layers: 6
+    enc_kernel: 3
+    enc_dropout: 0.1
+    n_heads: 2
+    window_size: 4
+    dec_dim: 128
+    pe_scale: 1000
+    fm_type: "CFM"  # FM, CFM
+    fm_net_type: "unet"  # unet or diffsinger
+    shift_by_mu: false  # whether to shift the prior distribution by mu. True means GradTTS-style.
+    condition_by_mu: true  # whether to condition the flow matching decoder by mu. False supports text-agnostic voice conversion like GlowTTS.
