@@ -35,9 +35,9 @@ This repository also contains some experimental functionalities. ⚠️Warning: 
 * **Voice conversion**. As GlowTTS can perform voice conversion via the disentangling property of normalizing flows, it is reasonable that flow matching can also perform it. Method `model.tts.GradTTS.voice_conversion` gives a preliminary try.
 
 * **Likelihood estimation**. Differential equation-based generative models have the ability to estimate data likelihoods by the instantaneous change-of-variable formula
-  $$
-  \log p_0(\boldsymbol x(0)) = \log p_1(\boldsymbol  x(1)) + \int _0^1 \nabla_{\boldsymbol x} \cdot {\boldsymbol v}(\boldsymbol x(t), t)\mathrm d t
-  $$
+```math
+\log p_0(\boldsymbol x(0)) = \log p_1(\boldsymbol  x(1)) + \int _0^1 \nabla_{\boldsymbol x} \cdot {\boldsymbol v}(\boldsymbol x(t), t)\mathrm d t
+```
   In practice, integral is replaced by summation, and divergence is replaced by the Skilling-Hutchinson trace estimator. See the Appendix D.2 in [Song, et. al](https://arxiv.org/abs/2011.13456) for theoretical details. I implemented this in `model.tts.GradTTS.compute_likelihood`. 
 * **Optimal transport**. The conditional flow matching used in this paper is not a **marginally** optimal transport path but only a **conditionally** optimal path. For the marginal optimal transport, [Tong et. al](https://arxiv.org/abs/2302.00482) introduces to sample $x_0,x_1$ together from the joint optimal transport distribution $\pi(x_0,x_1)$. I tried this in `model.cfm.OTCFM`, though it doe not work very well for now.
 * **Different estimator architectures**. You can specify an estimator besides the `GradLogPEstimator2d` by the `model.fm_net_type` configuration. Currently the [DiffSinger](https://ojs.aaai.org/index.php/AAAI/article/view/21350)'s estimator architecture is also supported. You can add more, e.g. that introduced in [Matcha-TTS](https://github.com/shivammehta25/Matcha-TTS).
