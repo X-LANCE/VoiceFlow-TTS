@@ -13,6 +13,10 @@ pip install -r requirements.txt
 
 # Then, set PATH
 source path.sh  # change the env name in it if you don't use "vflow"
+
+# Install monotonic_align for MAS
+cd model/monotonic_align
+python setup.py build_ext --inplace
 ```
 Note that to avoid the trouble of installing [torchdyn](https://github.com/DiffEqML/torchdyn), we directly copy the torchdyn 1.0.6 version here locally at `torchdyn/`.
 
