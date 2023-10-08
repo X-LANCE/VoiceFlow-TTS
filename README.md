@@ -34,7 +34,7 @@ In this example, the following plain text files are necessary:
 Also, there is a `data/ljspeech/phones.txt` file to specify all the phones together with their indexes in dictionary.
 
 For LJSpeech, we provide the processed file [online](https://huggingface.co/datasets/cantabile-kwok/ljspeech-1024-256-dur/resolve/main/ljspeech-1024-256.zip).
-You can download it and unzip to `data/ljspeech`.
+You can download it and unzip to `data/ljspeech/{train,val}`.
 If you want to train on your own dataset, you might have to create these files yourself (or change the data loading strategy).
 
 After having these manifest files, please do the following to extract mel-spectrogram for training:
@@ -115,7 +115,7 @@ python inference_dataset.py -c configs/${your_yaml} -m ${model_name} --EMA \
 This will synthesize mel-spectrograms for the validation set in your config, storing them at `synthetic_wav/${model_name}/tts_gt_spk/feats.scp`.
 Speaker, speed and temperature can be specified; see `tools.get_hparams_decode()` function for complete set of options.
 
-> TODO: VOCODER
+Inference can then be done in the `hifigan/` directory. Please refer to the [README](hifigan/README.md) there.
 
 ## Acknowledgement
 During the development, the following repositories were referred to:
