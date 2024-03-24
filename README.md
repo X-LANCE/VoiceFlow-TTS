@@ -140,12 +140,15 @@ This repository also contains some experimental functionalities. ⚠️Warning: 
 Feel free to cite this work if it helps 😄
 
 ```
-@misc{guo2023voiceflow,
-      title={VoiceFlow: Efficient Text-to-Speech with Rectified Flow Matching}, 
-      author={Yiwei Guo and Chenpeng Du and Ziyang Ma and Xie Chen and Kai Yu},
-      year={2023},
-      eprint={2309.05027},
-      archivePrefix={arXiv},
-      primaryClass={eess.AS}
+@INPROCEEDINGS{guo2024voiceflow,
+  author={Guo, Yiwei and Du, Chenpeng and Ma, Ziyang and Chen, Xie and Yu, Kai},
+  booktitle={ICASSP 2024 - 2024 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)}, 
+  title={{VoiceFlow}: Efficient Text-To-Speech with Rectified Flow Matching}, 
+  year={2024},
+  volume={},
+  number={},
+  pages={11121-11125},
+  keywords={Signal processing algorithms;Signal processing;Acoustics;Mathematical models;Vectors;Trajectory;Speech processing;Text-to-speech;flow matching;rectified flow;efficiency;speed-quality tradeoff},
+  doi={10.1109/ICASSP48485.2024.10445948}
 }
 ```
