@@ -53,22 +53,11 @@ class FM(nn.Module):
 
     @torch.no_grad()
     def inference(self, z, mask, mu, n_timesteps, spk=None, solver="dopri5"):
-        if solver != "xxx":  # FIXME: I wanted to implement Euler on my own but turns out not as good as NeuralODE
-            # Build a trajectory
-            t_span = torch.linspace(0, 1, n_timesteps+1)  # NOTE: n_timesteps means n+1 points in [0, 1]
-            neural_ode = NeuralODE(self.ode_wrapper(mask, mu, spk), solver=solver, sensitivity="adjoint", atol=1e-4, rtol=1e-4)
-            x = z
-            eval_points, traj = neural_ode(x, t_span)
-        else:
-            interval = 1 / n_timesteps
-            traj = []
-            traj.append(z)
-            x = z
-            for step in range(1, n_timesteps + 1):
-                t = torch.tensor([interval * step]).to(x.device)
-                vf = self.estimator(x, mask, mu, t, spk)
-                x = x + vf * interval
-                traj.append(x)
+        # Build a trajectory
+        t_span = torch.linspace(0, 1, n_timesteps+1)  # NOTE: n_timesteps means n+1 points in [0, 1]
+        neural_ode = NeuralODE(self.ode_wrapper(mask, mu, spk), solver=solver, sensitivity="adjoint", atol=1e-4, rtol=1e-4)
+        x = z
+        eval_points, traj = neural_ode(x, t_span)
         return traj
 
     def backward(self, x, mask, mu, n_timesteps, spk=None, solver="euler"):
